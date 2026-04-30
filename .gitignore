@@ -1,0 +1,92 @@
+# Ambiente Virtual Python
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Arquivos compilados Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Variáveis de Ambiente (SENSÍVEL)
+.env
+.env.local
+.env.*.local
+
+# Cache da Aplicação
+nf_cache.json
+*.cache
+.cache/
+
+# Logs
+*.log
+logs/
+
+# IDE e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Testes e Coverage
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+
+# Arquivos do Sistema
+.DS_Store
+Thumbs.db
+*.bak
+
+# Temp files
+tmp/
+temp/
+*.tmp
+
+# Postman/Collections (se houver)
+*.postman_collection.json
+*.postman_environment.json
+
+# Arquivos de Resultado Antigos (manter versionados, mas opcional)
+# resultado_extracao.json
+
+# Pasta de PDFs temporários
+Temp_PDFs_/
+*.pdf
+*.PNG
+*.png
+*.jpg
+*.jpeg

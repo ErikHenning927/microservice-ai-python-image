@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.github
+
+# Venv
+venv/
+.venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.egg-info/
+.pytest_cache/
+.tox/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Documentação (opcional - remover se quiser incluir)
+# *.md
+
+# Temporários
+*.tmp
+*.bak
+Temp_PDFs_/
+
+# Logs (podem ser inclusos, mas geralmente não)
+*.log
+
+# Variáveis de ambiente (segurança)
+.env.local
+.env.*.local

@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  nf-extractor-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    container_name: nf-extractor-api
+    
+    ports:
+      - "9001:9001"
+    
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DEBUG=${DEBUG:-false}
+    
+    volumes:
+      - ./nf-agent-telecontrol:/app/nf-agent-telecontrol
+      - ./nf_cache.json:/app/nf_cache.json
+    
+    # Reiniciar automático
+    restart: unless-stopped
+    
+    # Configuração de recursos
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    
+    # Logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Healthcheck já definido no Dockerfile
+    # Aqui podemos adicionar configurações adicionais se necessário
+
+networks:
+  default:
+    name: nf-network
+    driver: bridge
