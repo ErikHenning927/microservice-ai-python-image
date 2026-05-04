@@ -55,6 +55,7 @@ HTTP Response (JSON com dados)
 - Linux (recomendado) ou macOS
 - Python 3.9+
 - Tesseract OCR instalado
+- Redis instalado (ou via Docker)
 
 ### Instalação do Tesseract
 **Linux (Debian/Ubuntu):**
@@ -73,7 +74,16 @@ Baixe do: [Wiki Tesseract](https://github.com/UB-Mannheim/tesseract/wiki)
 ### Variáveis de Ambiente
 Crie um arquivo `.env` na raiz do projeto (ou modifique o `.env.example` existente):
 ```env
+# OpenAI
 OPENAI_API_KEY=sua_chave_aqui
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+CACHE_TTL_HOURS=24
+
+# App
 DEBUG=false
 ```
 
@@ -84,10 +94,22 @@ DEBUG=false
 pip install -r requirements.txt
 ```
 
+2. Certifique-se de que o Redis está rodando. Se estiver usando Docker:
+```bash
+docker compose up -d redis
+```
+
 ## Como Executar
 
-### Iniciar o Servidor
-Você pode executar o projeto usando o Docker (via `docker-compose up`) ou diretamente via Python:
+### Usando Docker (Recomendado)
+A maneira mais fácil de executar o projeto completo com Redis:
+
+```bash
+docker compose up --build
+```
+
+### Iniciar o Servidor Manualmente
+Você pode executar o projeto diretamente via Python:
 
 ```bash
 cd nf-agent

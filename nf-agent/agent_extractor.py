@@ -21,7 +21,7 @@ app = FastAPI(title=Config.APP_TITLE, version=Config.APP_VERSION)
 
 # Instancia services
 extraction_service = ExtractionService(api_key=Config.OPENAI_API_KEY)
-cache_service = CacheService(cache_file=Config.CACHE_FILE, ttl_hours=Config.CACHE_TTL_HOURS)
+cache_service = CacheService()
 
 # Instancia controller
 controller = ExtractionController(extraction_service=extraction_service, cache_service=cache_service)

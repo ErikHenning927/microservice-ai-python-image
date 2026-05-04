@@ -86,7 +86,5 @@ temp/
 # Pasta de PDFs temporários
 Temp_PDFs_/
 *.pdf
-*.PNG
-*.png
 *.jpg
 *.jpeg

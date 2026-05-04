@@ -10,9 +10,12 @@ class Config:
     # OpenAI
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     
-    # Cache
-    CACHE_FILE = "nf_cache.json"
-    CACHE_TTL_HOURS = 24
+    # Redis Cache
+    REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+    REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+    REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
+    REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+    CACHE_TTL_HOURS = int(os.getenv("CACHE_TTL_HOURS", "24"))
     
     # OCR
     OCR_DPI = 100
