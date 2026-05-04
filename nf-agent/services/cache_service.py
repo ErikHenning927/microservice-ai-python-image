@@ -1,81 +1,65 @@
 import json
-import os
+import redis
 import hashlib
-from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
+from ..config import Config
 
 
 class CacheService:
-    """Serviço responsável por gerenciamento de cache de extrações"""
+    """Serviço responsável por gerenciamento de cache de extrações usando Redis"""
     
-    def __init__(self, cache_file: str = "nf_cache.json", ttl_hours: int = 24):
-        self.cache_file = cache_file
-        self.ttl_hours = ttl_hours
-        self.file_cache: Dict[str, Any] = {}
-        self._load_from_disk()
-    
-    def _load_from_disk(self):
-        """Carrega cache do disco ao iniciar"""
-        if os.path.exists(self.cache_file):
-            try:
-                with open(self.cache_file, 'r', encoding='utf-8') as f:
-                    self.file_cache = json.load(f)
-            except Exception as e:
-                print(f"Erro ao carregar cache: {e}")
-                self.file_cache = {}
-    
-    def _save_to_disk(self):
-        """Salva cache no disco"""
-        try:
-            with open(self.cache_file, 'w', encoding='utf-8') as f:
-                json.dump(self.file_cache, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            print(f"Erro ao salvar cache: {e}")
+    def __init__(self, ttl_hours: Optional[int] = None):
+        self.ttl_seconds = (ttl_hours or Config.CACHE_TTL_HOURS) * 3600
+        self.redis_client = redis.Redis(
+            host=Config.REDIS_HOST,
+            port=Config.REDIS_PORT,
+            password=Config.REDIS_PASSWORD,
+            db=Config.REDIS_DB,
+            decode_responses=True
+        )
     
     @staticmethod
     def get_file_hash(contents: bytes) -> str:
         """Gera hash SHA256 do arquivo"""
         return hashlib.sha256(contents).hexdigest()
     
-    def _is_cache_valid(self, file_hash: str) -> bool:
-        """Verifica se o cache ainda é válido (não expirou)"""
-        if file_hash not in self.file_cache:
-            return False
-        
-        cached_time = datetime.fromisoformat(self.file_cache[file_hash].get('timestamp'))
-        expiration = cached_time + timedelta(hours=self.ttl_hours)
-        
-        if datetime.now() > expiration:
-            del self.file_cache[file_hash]
-            self._save_to_disk()
-            return False
-        
-        return True
-    
     def get(self, file_hash: str) -> Optional[Dict[str, Any]]:
         """Retorna resultado do cache se válido"""
-        if self._is_cache_valid(file_hash):
-            return self.file_cache[file_hash].get('data')
+        try:
+            cached_data = self.redis_client.get(file_hash)
+            if cached_data:
+                return json.loads(cached_data)
+        except Exception as e:
+            print(f"Erro ao buscar no Redis: {e}")
         return None
     
     def set(self, file_hash: str, data: Dict[str, Any]):
-        """Salva resultado no cache"""
-        self.file_cache[file_hash] = {
-            'timestamp': datetime.now().isoformat(),
-            'data': data
-        }
-        self._save_to_disk()
+        """Salva resultado no cache com TTL"""
+        try:
+            self.redis_client.setex(
+                file_hash,
+                self.ttl_seconds,
+                json.dumps(data, ensure_ascii=False)
+            )
+        except Exception as e:
+            print(f"Erro ao salvar no Redis: {e}")
     
     def get_stats(self) -> Dict[str, Any]:
-        """Retorna estatísticas do cache"""
-        return {
-            "total_cached": len(self.file_cache),
-            "cache_file": self.cache_file,
-            "ttl_hours": self.ttl_hours,
-            "cache_size_mb": os.path.getsize(self.cache_file) / (1024 * 1024) if os.path.exists(self.cache_file) else 0
-        }
+        """Retorna estatísticas do cache Redis"""
+        try:
+            info = self.redis_client.info()
+            return {
+                "total_cached_keys": self.redis_client.dbsize(),
+                "used_memory_human": info.get('used_memory_human'),
+                "ttl_hours": self.ttl_seconds / 3600,
+                "redis_version": info.get('redis_version')
+            }
+        except Exception as e:
+            return {"error": str(e)}
     
     def clear(self):
-        """Limpa o cache - escreve arquivo vazio em vez de remover"""
-        self.file_cache = {}
-        self._save_to_disk()
+        """Limpa o cache do banco atual"""
+        try:
+            self.redis_client.flushdb()
+        except Exception as e:
+            print(f"Erro ao limpar Redis: {e}")

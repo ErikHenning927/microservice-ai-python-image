@@ -13,10 +13,12 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1
 
-# Instalar dependências do sistema (incluindo Tesseract OCR)
+# Instalar dependências do sistema (incluindo Tesseract OCR, Poppler para PDF e dados da língua portuguesa)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr \
+    tesseract-ocr-por \
     libtesseract-dev \
+    poppler-utils \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 

@@ -14,10 +14,15 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - DEBUG=${DEBUG:-false}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
     
     volumes:
       - ./nf-agent-telecontrol:/app/nf-agent-telecontrol
-      - ./nf_cache.json:/app/nf_cache.json
+    
+    depends_on:
+      - redis
     
     # Reiniciar automático
     restart: unless-stopped
@@ -41,6 +46,18 @@ services:
     
     # Healthcheck já definido no Dockerfile
     # Aqui podemos adicionar configurações adicionais se necessário
+
+  redis:
+    image: redis:alpine
+    container_name: nf-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:
 
 networks:
   default:
